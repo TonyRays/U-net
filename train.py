@@ -13,12 +13,47 @@ from eval import eval_net
 from unet import UNet
 
 from torch.utils.tensorboard import SummaryWriter
-from utils.dataset import BasicDataset
+# from utils.dataset import BasicDataset
+# from utils.dataset import BasicDataset
+from dataset import LungDataset
+
+
+#dataset.py
+from os.path import splitext
+from os import listdir
+import numpy as np
+from glob import glob
+import torch
+from torch.utils.data import Dataset
+import logging
+from PIL import Image
+# from monai import transforms as mn_tf
+from tqdm import tqdm
+import os
+from torchvision import transforms as tf
+import torch.utils.data as Data
+# from utils import custom_transforms as tr
+import custom_transforms as tr
+import cv2
+#...
+
+
 from torch.utils.data import DataLoader, random_split
 
-dir_img = 'data/imgs/'
-dir_mask = 'data/masks/'
-dir_checkpoint = 'checkpoints/'
+# dir_img = 'data/imgs/'
+dir_img = 'D:\\code\\U-net\\train_images_1\\0\\img\\'
+# dir_mask = 'data/masks/'
+dir_mask = 'D:\\code\\U-net\\train_images_1\\0\\masks\\'
+# dir_checkpoint = 'checkpoints/'
+dir_checkpoint = 'checkpoints\\'
+
+trs = tf.Compose([
+    tr.RandomHorizontalFlip(),
+    tr.RandomScaleCrop(base_size=512, crop_size=512),
+    tr.RandomGaussianBlur(),  # 高斯模糊
+    tr.Normalize(mean=LungDataset.mean, std=LungDataset.std),
+    tr.ToTensor()
+])
 
 
 def train_net(net,
@@ -30,7 +65,8 @@ def train_net(net,
               save_cp=True,
               img_scale=0.5):
 
-    dataset = BasicDataset(dir_img, dir_mask, img_scale)
+    # dataset = BasicDataset(dir_img, dir_mask, img_scale)
+    dataset = dataset = LungDataset(root_dir=r'D:\code\U-net', transforms=trs, train=True)
     n_val = int(len(dataset) * val_percent)
     n_train = len(dataset) - n_val
     train, val = random_split(dataset, [n_train, n_val])
@@ -65,7 +101,8 @@ def train_net(net,
         with tqdm(total=n_train, desc=f'Epoch {epoch + 1}/{epochs}', unit='img') as pbar:
             for batch in train_loader:
                 imgs = batch['image']
-                true_masks = batch['mask']
+                # true_masks = batch['mask']
+                true_masks = batch['label']
                 assert imgs.shape[1] == net.n_channels, \
                     f'Network has been defined with {net.n_channels} input channels, ' \
                     f'but loaded images have {imgs.shape[1]} channels. Please check that ' \
@@ -154,7 +191,7 @@ if __name__ == '__main__':
     #   - For 1 class and background, use n_classes=1
     #   - For 2 classes, use n_classes=1
     #   - For N > 2 classes, use n_classes=N
-    net = UNet(n_channels=3, n_classes=1, bilinear=True)
+    net = UNet(n_channels=1, n_classes=1, bilinear=True)
     logging.info(f'Network:\n'
                  f'\t{net.n_channels} input channels\n'
                  f'\t{net.n_classes} output channels (classes)\n'

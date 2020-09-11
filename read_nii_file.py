@@ -7,9 +7,9 @@ def read_single_dict():
     # image = '../../dataset/LCTSC_1/test_nii_1/LCTSC-Test-S1-101.nii.gz'
     # label = '../../dataset/LCTSC_1/test_mask_nii/LCTSC-Test-S1-101.nii.gz'
     # set image path
-    image = 'D:\code\Pytorch-UNet-master\data\imgs\COVID-19-CT-Seg_20cases\coronacases_org_001.nii'
+    image = 'D:\\code\\U-net\\data\\imgs\\COVID-19-CT-Seg_20cases\\coronacases_org_001.nii'
     # set label path
-    label = 'D:\code\Pytorch-UNet-master\data\masks\Lung_and_Infection_Mask\coronacases_001.nii'
+    label = 'D:\\code\\U-net\\data\\masks\\Lung_and_Infection_Mask\\coronacases_001.nii'
     keys = ('image', 'label')
     mn_tfs = mn_tf.Compose([
         mn_tf.LoadNiftiD(keys),
@@ -56,8 +56,10 @@ def read_single_dict():
         label = item[1][0] * 255
         #index = torch.where(label == 1275)
         # plt.savefig('D:\code\Pytorch-UNet-master\data_test\mask'+str(idx)+'.jpg')
-        # plt.imsave('D:\code\Pytorch-UNet-master\data_test\images\image_'+str(idx)+'.jpg',image,cmap='gray')
-        # plt.imsave('D:\code\Pytorch-UNet-master\data_test\masks\mask_' + str(idx) + '.jpg', label, cmap='gray')
+        # path_test =  'D:\\code\\U-net\\train_images_1\\1\\img\\' + str(idx) + '_image' + '.png'
+        # print(path_test)
+        plt.imsave('D:\\code\\U-net\\train_images_1\\0\\img\\' + str(idx)  + '.png', image, cmap='gray')
+        plt.imsave('D:\\code\\U-net\\train_images_1\\0\\mask\\' + str(idx) + '_mask' + '.png', label, cmap='gray')
         if idx >= 120 and idx <= 121:
             # print(image)
             print(image.min(), image.max())
